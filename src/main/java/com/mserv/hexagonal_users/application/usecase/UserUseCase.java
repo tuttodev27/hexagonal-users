@@ -1,0 +1,37 @@
+package com.mserv.hexagonal_users.application.usecase;
+
+import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsException;
+import com.mserv.hexagonal_users.domain.model.User;
+import com.mserv.hexagonal_users.domain.port.AuthService;
+import com.mserv.hexagonal_users.domain.port.UserRepository;
+import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
+@Service
+public class UserUseCase {
+    private final UserRepository userRepository;
+    private final AuthService authService;
+
+
+    public UserUseCase(UserRepository userRepository, AuthService authService) {
+        this.userRepository = userRepository;
+        this.authService = authService;
+    }
+    public User execute(User user){
+        userRepository.findByEmail(user.getEmail()).ifPresent(existingUser ->{
+            throw new UserAlreadyExistsException("El correo ya existe");
+        });
+        user.setId(UUID.randomUUID());
+        LocalDateTime now= LocalDateTime.now();
+        user.setCreated(now);
+        user.setModified(now);
+        user.setLastLogin(now);
+
+        String token= authService.generateToken(user.getEmail());
+        user.setToken(token);
+        user.setActive(true);
+
+        return userRepository.save(user);
+    }
+}
