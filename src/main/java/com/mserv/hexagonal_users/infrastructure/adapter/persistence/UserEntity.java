@@ -3,7 +3,7 @@ package com.mserv.hexagonal_users.infrastructure.adapter.persistence;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
-import org.springframework.cglib.core.Local;
+
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -33,6 +33,8 @@ public class UserEntity {
 
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   List<PhoneEntity> phones = new ArrayList<>();
+
+
 
 
 }

@@ -1,9 +1,6 @@
 package com.mserv.hexagonal_users.domain.port;
 
 import com.mserv.hexagonal_users.domain.model.User;
-import com.mserv.hexagonal_users.infrastructure.adapter.persistence.JpaUserRepository;
-import org.springframework.data.jpa.repository.JpaRepository;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;

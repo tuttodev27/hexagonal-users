@@ -7,6 +7,7 @@ import lombok.Setter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
+
 @Getter
 @Setter
 @Builder
@@ -21,8 +22,9 @@ public class User {
     private LocalDateTime modified;
     private LocalDateTime lastLogin;
     private String token;
-    private boolean isActive;
+    private boolean isActive; // Lombok ya genera getter y setter
 
+    // Constructor para inicializar los valores del User
     public User(UUID id, String name, String email, String password, List<Phone> phones, LocalDateTime created, LocalDateTime modified, LocalDateTime lastLogin, String token, boolean isActive) {
         this.id = id;
         this.name = name;
@@ -31,18 +33,15 @@ public class User {
         this.phones = phones;
         this.created = created;
         this.modified = modified;
-        this.lastLogin = lastLogin;
-        this.token = token;
-        this.isActive = isActive;
+    }
+    public void prePersist() {
+        LocalDateTime now = LocalDateTime.now();
+        this.created = now;
+        this.modified = now;
+        this.lastLogin = now;
     }
 
-
-
-    public boolean isActive() {
-        return isActive;
-    }
-
-    public void setActive(boolean active) {
-        isActive = active;
+    public void preUpdate() {
+        this.modified = LocalDateTime.now();
     }
 }

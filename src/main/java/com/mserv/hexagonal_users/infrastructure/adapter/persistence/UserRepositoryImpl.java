@@ -2,7 +2,6 @@ package com.mserv.hexagonal_users.infrastructure.adapter.persistence;
 
 import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsException;
 import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
-import com.mserv.hexagonal_users.application.mappers.UserMapper;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
 import org.springframework.stereotype.Repository;
@@ -56,42 +55,33 @@ public class UserRepositoryImpl implements UserRepository {
             throw new UserAlreadyExistsException("Ya existe un usuario con este correo");
         }
 
-
         if (user.getId() == null) {
             user.setId(UUID.randomUUID());
         }
-
         UserEntity savedEntity = jpaUserRepository.save(toEntity(user));
         return toDomain(savedEntity);
     }
-
     @Override
     public Optional<User> findById(UUID id) {
-
         return jpaUserRepository.findById(id).map(this::toDomain);
     }
-
     @Override
     public Optional<User> findByEmail(String email) {
         return jpaUserRepository.findByEmail(email);
     }
-
-
     @Override
     public boolean existsByEmail(String email) {
         return jpaUserRepository.existsByEmail(email);
     }
-
     @Override
     public void deleteById(UUID id) {
         jpaUserRepository.deleteById(id);
     }
-
     @Override
     public List<User> findAll() {
         List<UserEntity> userEntities = jpaUserRepository.findAll();
         return userEntities.stream()
-                .map(this::toDomain) // Usamos el método toDomain() para convertir de UserEntity a User
+                .map(this::toDomain)
                 .collect(Collectors.toList());
     }
 
@@ -103,7 +93,7 @@ public class UserRepositoryImpl implements UserRepository {
 
         user.setModified(LocalDateTime.now());
         UserEntity updatedEntity = jpaUserRepository.save(toEntity(user)); // Guardar UserEntity
-        return toDomain(updatedEntity); // Convertir de UserEntity a User
+        return toDomain(updatedEntity);
     }
 
     @Override
