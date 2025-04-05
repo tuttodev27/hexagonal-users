@@ -1,12 +1,14 @@
 package com.mserv.hexagonal_users.application.usecase;
 
 import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsException;
+import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.AuthService;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 @Service
 public class UserUseCase {
@@ -34,4 +36,21 @@ public class UserUseCase {
 
         return userRepository.save(user);
     }
+    public User getUserById (UUID id){
+        return userRepository.findById(id).orElseThrow(()->new UserNotFoundException("Usuario no encontrado con ID " + id));
+    }
+
+    public User getUserByEmail(String email){
+        return userRepository.findByEmail(email)
+                .orElseThrow(()-> new UserNotFoundException("Usuario no encontrado con el email: " + email));
+    }
+
+    public User updateUser(User user){
+        if(!userRepository.existsByEmail(user.getEmail())){
+            throw new UserNotFoundException("Usuario no encontrado con el email: " + user.getEmail());
+        }
+        user.setModified(LocalDateTime.now());
+        return userRepository.save(user);
+    }
+
 }

@@ -1,30 +1,22 @@
 package com.mserv.hexagonal_users.domain.model;
 
-import java.util.UUID;
-
 public class Phone {
-    private UUID id;
+
     private String number;
     private String cityCode;
-    private String cityCountry;
+    private String countryCode;
 
-    public Phone(UUID id, String cityCode, String number, String cityCountry) {
-        this.id = id;
+    public Phone(String cityCode, String number, String countryCode) {
+
         this.cityCode = cityCode;
         this.number = number;
-        this.cityCountry = cityCountry;
+        this.countryCode = countryCode;
     }
 
     public Phone() {
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public void setId(UUID id) {
-        this.id = id;
-    }
 
     public String getNumber() {
         return number;
@@ -42,12 +34,12 @@ public class Phone {
         this.cityCode = cityCode;
     }
 
-    public String getCityCountry() {
-        return cityCountry;
+    public String getCountryCode() {
+        return countryCode;
     }
 
-    public void setCityCountry(String cityCountry) {
-        this.cityCountry = cityCountry;
+    public void setCountryCode(String countryCode) {
+        this.countryCode = countryCode;
     }
 }
 
