@@ -53,4 +53,20 @@ public class UserUseCase {
         return userRepository.save(user);
     }
 
+    public void deleteUser(UUID id) {
+
+        if (!userRepository.findById(id).isPresent()) {
+            throw new UserNotFoundException("Usuario no encontrado con ID: " + id);
+        }
+        userRepository.deleteById(id);
+    }
+
+    public Iterable<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+   public long countUsers() {
+        return userRepository.count();
+    }
+
 }

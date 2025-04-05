@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.cglib.core.Local;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -16,6 +17,7 @@ import java.util.UUID;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @Getter
 @Setter
+@Builder
 public class UserEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
@@ -30,7 +32,7 @@ public class UserEntity {
    boolean isActive;
 
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  List<PhoneEntity> phones;
+  List<PhoneEntity> phones = new ArrayList<>();
 
 
 }

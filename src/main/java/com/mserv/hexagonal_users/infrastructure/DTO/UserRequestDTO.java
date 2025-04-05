@@ -32,4 +32,6 @@ public class UserRequestDTO {
     @NotEmpty(message = "Debe proporcionar al menos un telefono")
     @Valid
     List<PhoneRequestDTO> phones;
+
+
 }
