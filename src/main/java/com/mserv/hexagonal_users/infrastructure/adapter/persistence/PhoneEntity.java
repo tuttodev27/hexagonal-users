@@ -12,17 +12,19 @@ import java.util.UUID;
 @NoArgsConstructor
 @Getter
 @Setter
-@FieldDefaults(level = AccessLevel.PRIVATE)
+
 @Builder
 public class PhoneEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
-    String number;
-    String cityCode;
-    String countryCode;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID id;
+
+    private String number;
+    private String cityCode;
+    private String countryCode;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private UserEntity user;
 }

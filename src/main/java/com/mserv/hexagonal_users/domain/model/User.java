@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,20 +18,19 @@ public class User {
     private String name;
     private String email;
     private String password;
-    private List<Phone> phones;
+    private List<Phone> phones = new ArrayList<>();
     private LocalDateTime created;
     private LocalDateTime modified;
     private LocalDateTime lastLogin;
     private String token;
-    private boolean isActive; // Lombok ya genera getter y setter
+    private boolean isActive;
 
-    // Constructor para inicializar los valores del User
     public User(UUID id, String name, String email, String password, List<Phone> phones, LocalDateTime created, LocalDateTime modified, LocalDateTime lastLogin, String token, boolean isActive) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
-        this.phones = phones;
+        this.phones = phones != null ? phones : new ArrayList<>();
         this.created = created;
         this.modified = modified;
     }

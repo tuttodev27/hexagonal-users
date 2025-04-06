@@ -1,22 +1,20 @@
 package com.mserv.hexagonal_users.infrastructure.DTO;
 
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.List;
+
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
-
 public class UserRequestDTO {
+
     @NotBlank(message = "El nombre no puede estar vacío")
     @Size(min = 2, max = 100, message = "El nombre debe tener entre 2 y 100 caracteres")
     String name;
@@ -27,11 +25,12 @@ public class UserRequestDTO {
 
     @NotBlank(message = "La contraseña es obligatoria")
     @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
+    @Pattern(
+            regexp = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,}$",
+            message = "La contraseña debe tener al menos una letra y un número")
     String password;
 
-    @NotEmpty(message = "Debe proporcionar al menos un telefono")
+    @NotEmpty(message = "Debe proporcionar al menos un teléfono")
     @Valid
     List<PhoneRequestDTO> phones;
-
-
 }

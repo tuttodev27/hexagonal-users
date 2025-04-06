@@ -29,8 +29,7 @@ public class SecurityConfig  {
                 .cors(cors -> cors.configurationSource(corsConfigurationSource())) // Habilita CORS con configuración personalizada
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // Sin sesión
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/register").permitAll() // Endpoint de registro sin autenticación
-                        .requestMatchers("/h2-console/**").permitAll() // Permite el acceso a la consola H2
+                        .requestMatchers("/api/users/register", "/h2-console/**", "/swagger-ui/**").permitAll() // Endpoint de registro sin autenticación
                         .anyRequest().authenticated() // El resto de las rutas requieren autenticación
                 )
                 .headers(headers -> headers

@@ -5,6 +5,7 @@ import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.AuthService;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -15,18 +16,22 @@ public class UserUseCase {
     private final UserRepository userRepository;
     private final AuthService authService;
 
+    @Autowired
     public UserUseCase(UserRepository userRepository, AuthService authService) {
         this.userRepository = userRepository;
         this.authService = authService;
     }
 
+    public boolean isRegisterEmail(String email){
+        return userRepository.existsByEmail(email);
+    }
     public User execute(User user) {
-        // Verificar si el correo ya está registrado
+
         userRepository.findByEmail(user.getEmail()).ifPresent(existingUser -> {
             throw new UserAlreadyExistsException("El correo ya está registrado");
         });
 
-        // Asignar un nuevo ID y las fechas de creación y modificación
+
         user.setId(UUID.randomUUID());
         LocalDateTime now = LocalDateTime.now();
         user.setCreated(now);

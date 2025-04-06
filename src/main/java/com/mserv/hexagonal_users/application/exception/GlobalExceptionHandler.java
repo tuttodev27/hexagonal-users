@@ -1,7 +1,5 @@
 package com.mserv.hexagonal_users.application.exception;
 
-import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsException;
-import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.infrastructure.exception.ErrorResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -34,4 +32,16 @@ public class GlobalExceptionHandler {
 
         return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        ErrorResponse errorResponse = ErrorResponse.builder()
+                .status("error")
+                .message("Ocurrió un error inesperado.")
+                .details(ex.getMessage())
+                .errorCode("INTERNAL_SERVER_ERROR")
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
 }

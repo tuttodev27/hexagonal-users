@@ -34,8 +34,5 @@ public class UserEntity {
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
   List<PhoneEntity> phones = new ArrayList<>();
 
-
-
-
 }
 
