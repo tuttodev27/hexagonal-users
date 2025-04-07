@@ -24,6 +24,7 @@ public class PhoneEntityMapper {
             return null;
         }
         PhoneEntity phoneEntity = new PhoneEntity();
+
         phoneEntity.setNumber(phone.getNumber());
         phoneEntity.setCityCode(phone.getCityCode());
         phoneEntity.setCountryCode(phone.getCountryCode());

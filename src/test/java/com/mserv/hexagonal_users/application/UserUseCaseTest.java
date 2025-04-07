@@ -10,9 +10,11 @@ import com.mserv.hexagonal_users.domain.port.UserRepository;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -20,11 +22,10 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
-
+@ExtendWith(MockitoExtension.class)
 public class UserUseCaseTest {
     @Mock
     private UserRepository userRepository;  // Mock del repositorio
-
 
     @Mock
     private AuthService authService;
@@ -32,15 +33,12 @@ public class UserUseCaseTest {
     @InjectMocks
     private UserUseCase userUseCase;
 
-
-
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.openMocks(this);
     }
 
     @Test
-
     public void shouldRegisterUserSuccessfully() {
         // Arrange
         User user = new User();
