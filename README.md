@@ -41,10 +41,12 @@ El proyecto está estructurado de la siguiente manera:
 
 ### 2. Accede al directorio donde se encuentra el proyecto
 
+
+   ```bash
    cd hexagonal-users
 
 ### 3. Instalar Dependencias
-
+   ```bash
     mvn clean install
     
 
