@@ -7,10 +7,10 @@ import java.util.UUID;
 
 public interface UserRepository{
     User save(User user);
-    Optional<User> findById(UUID id);
+    Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
     boolean existsByEmail(String email);
-    void deleteById(UUID id);
+    void deleteById(Long id);
     List<User> findAll();
     User update(User user);
     long count();

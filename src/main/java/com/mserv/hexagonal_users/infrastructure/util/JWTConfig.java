@@ -16,6 +16,8 @@ public class JWTConfig {
     private long expiration;
     @PostConstruct
     public void validate() {
+        System.out.println("Clave secreta cargada: " + secret); // Esto te ayudará a verificar el valor cargado
+
         if (secret == null || secret.isBlank()) {
             throw new IllegalArgumentException("El secreto JWT no puede estar vacío.");
         }
@@ -23,5 +25,7 @@ public class JWTConfig {
             throw new IllegalArgumentException("El tiempo de expiración JWT debe ser mayor a 0.");
         }
     }
+
 }
+
 

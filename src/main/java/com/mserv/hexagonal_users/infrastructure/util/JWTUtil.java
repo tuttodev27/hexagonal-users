@@ -1,62 +1,61 @@
 package com.mserv.hexagonal_users.infrastructure.util;
 
+import com.mserv.hexagonal_users.infrastructure.config.JwtProperties;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.util.Date;
-import java.util.UUID;
-import java.util.logging.Logger;
 
 @Component
 public class JWTUtil {
 
-    private static final Logger LOGGER = Logger.getLogger(JWTUtil.class.getName());
-    private final JWTConfig jwtConfig;
-    private final SecretKey signingKey;
+    private final JwtProperties jwtProperties;
 
-    public JWTUtil(JWTConfig jwtConfig) {
-        this.jwtConfig = jwtConfig;
-        this.signingKey = Keys.hmacShaKeyFor(jwtConfig.getSecret().getBytes());
+    // Constructor correcto con @Autowired
+    @Autowired
+    public JWTUtil(JwtProperties jwtProperties) {
+        this.jwtProperties = jwtProperties;
     }
-    public String generateToken(String email) {
+
+    private SecretKey getSigningKey() {
+        // Asegúrate de que la clave secreta tenga al menos 512 bits
+        return Keys.hmacShaKeyFor(jwtProperties.getSecret().getBytes());
+    }
+
+    public String generateToken(String username) {
         return Jwts.builder()
-                .setSubject(email)
-                .setId(UUID.randomUUID().toString())
+                .setSubject(username)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + jwtConfig.getExpiration()))
-                .signWith(signingKey, SignatureAlgorithm.HS256)
+                .setExpiration(new Date(System.currentTimeMillis() + jwtProperties.getExpiration()))
+                .signWith(getSigningKey()) // Usa la nueva clave generada
                 .compact();
     }
 
-
-    public String getEmailFromToken(String token) {
-        return getAllClaimsFromToken(token).getSubject();
-    }
-
-
     public boolean validateToken(String token) {
         try {
-            Jwts.parserBuilder().setSigningKey(signingKey).build().parseClaimsJws(token);
+            Jwts.parser().setSigningKey(getSigningKey()).parseClaimsJws(token); // Usa la nueva clave generada
             return true;
-        } catch (ExpiredJwtException e) {
-            LOGGER.warning("Token expirado");
-        } catch (MalformedJwtException e) {
-            LOGGER.warning("Token mal formado");
-        } catch (UnsupportedJwtException e) {
-            LOGGER.warning("Token no soportado");
-        } catch (IllegalArgumentException e) {
-            LOGGER.warning("Token vacío o nulo");
+        } catch (SignatureException | MalformedJwtException | ExpiredJwtException |
+                 UnsupportedJwtException | IllegalArgumentException e) {
+            e.printStackTrace();
+            return false;
         }
-        return false;
     }
 
+    public String extractUsername(String token) {
+        Claims claims = Jwts.parser()
+                .setSigningKey(getSigningKey()) // Usa la nueva clave generada
+                .parseClaimsJws(token)
+                .getBody();
+        return claims.getSubject();
+    }
 
     public Claims getAllClaimsFromToken(String token) {
-        return Jwts.parserBuilder()
-                .setSigningKey(signingKey)
-                .build()
+        return Jwts.parser()
+                .setSigningKey(getSigningKey()) // Usa la nueva clave generada
                 .parseClaimsJws(token)
                 .getBody();
     }

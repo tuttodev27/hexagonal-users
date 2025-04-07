@@ -8,23 +8,22 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "phones")
-@AllArgsConstructor
-@NoArgsConstructor
 @Getter
 @Setter
-
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
+
 public class PhoneEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID id;
-
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
     private String number;
     private String cityCode;
     private String countryCode;
 
     @ManyToOne
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
     private UserEntity user;
 }

@@ -43,6 +43,7 @@ public class PhoneMapper {
         }
 
         return new PhoneResponseDTO(
+                phone.getId(),
                 phone.getNumber(),
                 phone.getCityCode(),
                 phone.getCountryCode()
@@ -56,8 +57,9 @@ public class PhoneMapper {
         }
 
         return new Phone(
-                phoneRequestDTO.getCityCode(),
+                null,
                 phoneRequestDTO.getNumber(),
+                phoneRequestDTO.getCityCode(),
                 phoneRequestDTO.getCountryCode()
         );
     }

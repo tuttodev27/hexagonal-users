@@ -6,10 +6,14 @@ import com.mserv.hexagonal_users.domain.port.UserRepository;
 import com.mserv.hexagonal_users.infrastructure.util.JWTConfig;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.nio.charset.StandardCharsets;
+import java.security.Key;
 import java.util.Date;
 import java.util.Optional;
 
@@ -17,6 +21,8 @@ import static javax.crypto.Cipher.SECRET_KEY;
 
 @Service
 public class AuthServicesImpl implements AuthService {
+    @Value("${jwt.secret}")
+    private String secretKey;
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -43,12 +49,22 @@ public class AuthServicesImpl implements AuthService {
 
     @Override
     public String generateToken(String email) {
-        Date now = new Date();
-        Date expirationDate = new Date(now.getTime() + jwtConfig.getExpiration());
+        // Verificar que la clave secreta no sea nula ni vacía
+        if (secretKey == null || secretKey.isEmpty()) {
+            throw new IllegalArgumentException("La clave secreta no puede ser nula o vacía");
+        }
 
-        return Jwts.builder().setSubject(email).setIssuedAt(new Date()).setExpiration(expirationDate).
-                signWith(SignatureAlgorithm.HS256, String.valueOf(SECRET_KEY)).compact();
+        // Crear la clave de firma con la clave secreta
+        Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
+
+        // Generar el token JWT con el correo electrónico como subject
+        return Jwts.builder()
+                .setSubject(email) // Usamos el correo electrónico como el subject
+                .signWith(key, SignatureAlgorithm.HS256)
+                .compact();
     }
+
+
 
     @Override
     public boolean validateToken(String token) {

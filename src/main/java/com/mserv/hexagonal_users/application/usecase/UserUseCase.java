@@ -5,6 +5,7 @@ import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.AuthService;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
+import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -32,7 +33,7 @@ public class UserUseCase {
         });
 
 
-        user.setId(UUID.randomUUID());
+        user.setId(System.currentTimeMillis());
         LocalDateTime now = LocalDateTime.now();
         user.setCreated(now);
         user.setModified(now);
@@ -47,7 +48,7 @@ public class UserUseCase {
         return userRepository.save(user);
     }
 
-    public User getUserById(UUID id) {
+    public User getUserById(Long id) {
         return userRepository.findById(id).orElseThrow(() ->
                 new UserNotFoundException("Usuario no encontrado con ID: " + id));
     }
@@ -61,7 +62,7 @@ public class UserUseCase {
         user.setModified(LocalDateTime.now());
         return userRepository.save(user);
     }
-   public void deleteUser(UUID id) {
+   public void deleteUser(Long id) {
         getUserById(id);
         userRepository.deleteById(id);
     }

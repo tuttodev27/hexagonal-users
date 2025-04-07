@@ -4,9 +4,11 @@ import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsExceptio
 import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
+import com.mserv.hexagonal_users.infrastructure.adapter.persistence.mapper.PhoneEntityMapper;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -22,7 +24,8 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private UserEntity toEntity(User user) {
-        return UserEntity.builder()
+        // Creamos y devolvemos la entidad UserEntity
+        UserEntity userEntity= UserEntity.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -31,52 +34,79 @@ public class UserRepositoryImpl implements UserRepository {
                 .modified(user.getModified())
                 .lastLogin(user.getLastLogin())
                 .token(user.getToken())
-                .isActive(user.isActive())
+                .active(user.isActive())
                 .build();
+
+        List<PhoneEntity> phoneEntities = user.getPhones() != null
+                ? user.getPhones().stream()
+                .map(phone -> PhoneEntityMapper.toEntity(phone, userEntity))
+                .collect(Collectors.toList())
+                : new ArrayList<>();
+
+        userEntity.setPhones(phoneEntities);
+
+        return userEntity;
+
     }
 
+
+
+
     private User toDomain(UserEntity userEntity) {
-        return User.builder()
-                .id(userEntity.getId())
-                .name(userEntity.getName())
-                .email(userEntity.getEmail())
-                .password(userEntity.getPassword())
-                .created(userEntity.getCreated())
-                .modified(userEntity.getModified())
-                .lastLogin(userEntity.getLastLogin())
-                .token(userEntity.getToken())
-                .isActive(userEntity.isActive())
-                .build();
-    }
+        return new User(
+            userEntity.getId(),
+            userEntity.getName(),
+            userEntity.getEmail(),
+            userEntity.getPassword(),
+            userEntity.getCreated(),
+            userEntity.getLastLogin(),
+            userEntity.getModified(),
+            userEntity.getToken(),
+            userEntity.isActive(),
+            userEntity.getPhones() != null ? userEntity.getPhones().stream()
+                    .map(PhoneEntityMapper::toDomain)
+                    .collect(Collectors.toList()) : new ArrayList<>()
+    );
+}
+
+
 
     @Override
     public User save(User user) {
+
         if (jpaUserRepository.existsByEmail(user.getEmail())) {
             throw new UserAlreadyExistsException("Ya existe un usuario con este correo");
         }
 
         if (user.getId() == null) {
-            user.setId(UUID.randomUUID());
+            user.setId(System.currentTimeMillis());
         }
-        UserEntity savedEntity = jpaUserRepository.save(toEntity(user));
+        UserEntity userEntity = toEntity(user);
+        UserEntity savedEntity = jpaUserRepository.save(userEntity);
         return toDomain(savedEntity);
     }
+
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<User> findById(Long id) {
         return jpaUserRepository.findById(id).map(this::toDomain);
     }
+
     @Override
     public Optional<User> findByEmail(String email) {
-        return jpaUserRepository.findByEmail(email);
+        return jpaUserRepository.findByEmail(email)
+                .map(this::toDomain);
     }
+
     @Override
     public boolean existsByEmail(String email) {
         return jpaUserRepository.existsByEmail(email);
     }
+
     @Override
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         jpaUserRepository.deleteById(id);
     }
+
     @Override
     public List<User> findAll() {
         List<UserEntity> userEntities = jpaUserRepository.findAll();
@@ -92,7 +122,7 @@ public class UserRepositoryImpl implements UserRepository {
         }
 
         user.setModified(LocalDateTime.now());
-        UserEntity updatedEntity = jpaUserRepository.save(toEntity(user)); // Guardar UserEntity
+        UserEntity updatedEntity = jpaUserRepository.save(toEntity(user));
         return toDomain(updatedEntity);
     }
 

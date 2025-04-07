@@ -12,21 +12,21 @@ import java.util.UUID;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@FieldDefaults(level= AccessLevel.PRIVATE)
+
 
 public class UserResponseDTO {
 
-    UUID id;
-    String name;
-    String email;
-    List<PhoneResponseDTO> phones;
+    private Long id;
+    private String name;
+    private String email;
+    private List<PhoneResponseDTO> phones;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime created;
+    private LocalDateTime created;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime modified;
+    private LocalDateTime modified;
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
-    LocalDateTime lastLogin;
-    String token;
-    boolean isActive;
+    private LocalDateTime lastLogin;
+    private String token;
+    private boolean active;
 
 }

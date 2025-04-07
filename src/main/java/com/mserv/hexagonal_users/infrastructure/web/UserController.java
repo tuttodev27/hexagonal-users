@@ -5,59 +5,108 @@ import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.application.mappers.UserMapper;
 import com.mserv.hexagonal_users.application.usecase.UserUseCase;
 import com.mserv.hexagonal_users.domain.model.User;
+import com.mserv.hexagonal_users.infrastructure.DTO.LoginRequestDTO;
+import com.mserv.hexagonal_users.infrastructure.DTO.LoginResponseDTO;
 import com.mserv.hexagonal_users.infrastructure.DTO.UserRequestDTO;
 import com.mserv.hexagonal_users.infrastructure.DTO.UserResponseDTO;
+import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
 import com.mserv.hexagonal_users.infrastructure.exception.ErrorResponse;
-import com.mserv.hexagonal_users.infrastructure.util.JWTConfig;
 import com.mserv.hexagonal_users.infrastructure.util.JWTUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+
 @Slf4j
 @RestController
 @RequestMapping("api/users")
 public class UserController {
-    private final UserUseCase userUseCase;
-    private final JWTUtil jwtUtil;
 
-    public UserController(UserUseCase userUseCase, JWTUtil jwtUtil) {
+    private final UserUseCase userUseCase;
+
+    private final JWTUtil jwtUtil;
+    private final UserMapper userMapper;
+
+    public UserController(UserUseCase userUseCase, JWTUtil jwtUtil, UserMapper userMapper) {
         this.userUseCase = userUseCase;
         this.jwtUtil = jwtUtil;
+        this.userMapper = userMapper;
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
+
+            try {
+                // Convert from UserRequestDTO to UserEntity
+                UserEntity userEntity = userMapper.fromRequestDTO(userRequestDTO);
+                userEntity.setCreated(LocalDateTime.now());
+                userEntity.setModified(LocalDateTime.now());
+                userEntity.setLastLogin(LocalDateTime.now());
+                String token = jwtUtil.generateToken(userEntity.getEmail());
+                userEntity.setToken(token);
+                userEntity.setActive(true);
+
+                // Map UserEntity to User domain model
+                User user = userMapper.toDomain(userEntity); // Assuming you have a toDomain method to convert UserEntity to User
+
+                // Save the user via UseCase
+                User savedUser = userUseCase.execute(user);
+
+                // Convert savedUser to UserResponseDTO and send response
+                UserResponseDTO responseDTO = userMapper.toResponseDTO(savedUser);
+                responseDTO.setToken(token);
+
+                return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+            } catch (UserAlreadyExistsException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse("400", e.getMessage(), "Correo duplicado", "ERR_DUPLICATE_EMAIL"));
+            } catch (Exception e) {
+                log.error("Error al registrar usuario: ", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new ErrorResponse("500", "Ocurrió un error al registrar el usuario. Intente nuevamente más tarde.", e.getMessage(), "ERR_INTERNAL_SERVER"));
+            }
+        }
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequest) {
         try {
-            User user = UserMapper.fromRequestDTO(userRequestDTO);
-            User saveUser = userUseCase.execute(user);
 
-            String token = jwtUtil.generateToken(saveUser.getEmail());
-            UserResponseDTO responseDTO = UserMapper.toResponseDTO(saveUser);
-            responseDTO.setToken(token);
+            User user = userUseCase.getUserByEmail(loginRequest.getEmail());
+            if (!user.getPassword().equals(loginRequest.getPassword())) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                        .body(new ErrorResponse("401", "Credenciales inválidas", "El correo o la contraseña no son correctos", "ERR_INVALID_CREDENTIALS"));
+            }
+            String token = jwtUtil.generateToken(user.getEmail());
+            UserResponseDTO userDTO = userMapper.toResponseDTO(user);
+            LoginResponseDTO response = new LoginResponseDTO();
+            response.setToken(token);
+            response.setUser(userDTO);
 
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+            return ResponseEntity.ok(response);
 
-        } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("400", e.getMessage(), "Correo duplicado", "ERR_DUPLICATE_EMAIL"));
+        } catch (UserNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(new ErrorResponse("401", e.getMessage(), "Usuario no registrado", "ERR_USER_NOT_FOUND"));
         } catch (Exception e) {
-            log.error("Error al registrar usuario: ", e);
+            log.error("Error durante login: ", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse("500", "Ocurrió un error al registrar el usuario. Intente nuevamente más tarde.", e.getMessage(), "ERR_INTERNAL_SERVER"));
+                    .body(new ErrorResponse("500", "Ocurrió un error al intentar iniciar sesión.", e.getMessage(), "ERR_INTERNAL_LOGIN"));
         }
     }
 
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable UUID id) {
+    public ResponseEntity<?> getUserById(@PathVariable Long id) {
         try {
             User user = userUseCase.getUserById(id);
-            UserResponseDTO responseDTO = UserMapper.toResponseDTO(user);
+            UserResponseDTO responseDTO = userMapper.toResponseDTO(user);
             return ResponseEntity.ok(responseDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -66,12 +115,20 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable UUID id, @Valid @RequestBody UserRequestDTO userRequestDTO) {
+    public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDTO userRequestDTO) {
         try {
-            User user = UserMapper.fromRequestDTO(userRequestDTO);
-            user.setId(id);
+            // Convert DTO to UserEntity first
+            UserEntity userEntity = userMapper.fromRequestDTO(userRequestDTO);
+            userEntity.setId(id);
+
+            // Convert UserEntity to User (domain model)
+            User user = userMapper.toDomain(userEntity);
+
+            // Update the user using the UseCase
             User updatedUser = userUseCase.updateUser(user);
-            UserResponseDTO responseDTO = UserMapper.toResponseDTO(updatedUser);
+
+            // Convert updatedUser to UserResponseDTO and send response
+            UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
             return ResponseEntity.ok(responseDTO);
         } catch (UserNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
@@ -79,8 +136,9 @@ public class UserController {
         }
     }
 
+
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable UUID id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
             userUseCase.deleteUser(id);
             return ResponseEntity.noContent().build();
@@ -94,7 +152,7 @@ public class UserController {
     public ResponseEntity<List<UserResponseDTO>> getAllUsers() {
         List<User> users = (List<User>) userUseCase.getAllUsers();
         List<UserResponseDTO> response = users.stream()
-                .map(UserMapper::toResponseDTO)
+                .map(userMapper::toResponseDTO)
                 .collect(Collectors.toList());
         return ResponseEntity.ok(response);
     }
@@ -104,8 +162,9 @@ public class UserController {
         long count = userUseCase.countUsers();
         return ResponseEntity.ok(count);
     }
+
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateUserPartial(@PathVariable UUID id, @RequestBody UserRequestDTO userRequestDTO) {
+    public ResponseEntity<?> updateUserPartial(@PathVariable Long id, @RequestBody UserRequestDTO userRequestDTO) {
         try {
             User existingUser = userUseCase.getUserById(id);
             if (userRequestDTO.getEmail() != null) {
@@ -117,8 +176,9 @@ public class UserController {
             if (userRequestDTO.getPassword() != null) {
                 existingUser.setPassword(userRequestDTO.getPassword());
             }
+
             User updatedUser = userUseCase.updateUser(existingUser);
-            UserResponseDTO responseDTO = UserMapper.toResponseDTO(updatedUser);
+            UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
             return ResponseEntity.ok(responseDTO);
 
         } catch (UserNotFoundException e) {

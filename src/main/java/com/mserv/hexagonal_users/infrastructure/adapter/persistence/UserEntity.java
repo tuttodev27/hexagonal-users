@@ -1,5 +1,6 @@
 package com.mserv.hexagonal_users.infrastructure.adapter.persistence;
 
+import com.mserv.hexagonal_users.domain.model.Phone;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -14,25 +15,38 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @Table(name="users")
-@FieldDefaults(level = AccessLevel.PRIVATE)
+
 @Getter
 @Setter
+@Data
+@ToString
+@EqualsAndHashCode
 @Builder
 public class UserEntity {
    @Id
    @GeneratedValue(strategy = GenerationType.AUTO)
-   UUID id;
-   String name;
-   String email;
-   String password;
-   LocalDateTime created;
-   LocalDateTime modified;
-   LocalDateTime lastLogin;
-   String token;
-   boolean isActive;
+   private Long id;
+   private String name;
+   private String email;
+   private String password;
+   private LocalDateTime created;
+   private LocalDateTime modified;
+   private LocalDateTime lastLogin;
+   private String token;
+   private boolean active;
 
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  List<PhoneEntity> phones = new ArrayList<>();
+   private List<PhoneEntity> phones = new ArrayList<>();
 
+   public void prePersist() {
+      LocalDateTime now = LocalDateTime.now();
+      this.created = now;
+      this.modified = now;
+      this.lastLogin = now;
+   }
+
+   public void preUpdate() {
+      this.modified = LocalDateTime.now();
+   }
 }
 
