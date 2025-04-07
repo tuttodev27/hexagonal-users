@@ -51,20 +51,20 @@ public class UserRepositoryImpl implements UserRepository {
 
     private User toDomain(UserEntity userEntity) {
         return new User(
-            userEntity.getId(),
-            userEntity.getName(),
-            userEntity.getEmail(),
-            userEntity.getPassword(),
-            userEntity.getCreated(),
-            userEntity.getLastLogin(),
-            userEntity.getModified(),
-            userEntity.getToken(),
-            userEntity.isActive(),
-            userEntity.getPhones() != null ? userEntity.getPhones().stream()
-                    .map(PhoneEntityMapper::toDomain)
-                    .collect(Collectors.toList()) : new ArrayList<>()
-    );
-}
+                userEntity.getId(),  // Long
+                userEntity.getPhones() != null ? userEntity.getPhones().stream()
+                        .map(PhoneEntityMapper::toDomain)
+                        .collect(Collectors.toList()) : new ArrayList<>(), // List<Phone>
+                userEntity.isActive(),  // boolean
+                userEntity.getLastLogin(),  // LocalDateTime
+                userEntity.getToken(),  // String
+                userEntity.getModified(),  // LocalDateTime
+                userEntity.getPassword(),  // String
+                userEntity.getCreated(),  // LocalDateTime
+                userEntity.getEmail(),  // String
+                userEntity.getName()  // String
+        );
+    }
 
     @Override
     public User save(User user) {

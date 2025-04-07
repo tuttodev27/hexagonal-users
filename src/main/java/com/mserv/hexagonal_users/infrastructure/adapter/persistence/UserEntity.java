@@ -24,7 +24,7 @@ import java.util.UUID;
 @Builder
 public class UserEntity {
    @Id
-   @GeneratedValue(strategy = GenerationType.AUTO)
+   @GeneratedValue(strategy = GenerationType.IDENTITY)
    private Long id;
    private String name;
    private String email;
@@ -34,6 +34,9 @@ public class UserEntity {
    private LocalDateTime lastLogin;
    private String token;
    private boolean active;
+
+   @Version
+   private Long version;
 
    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
    private List<PhoneEntity> phones = new ArrayList<>();

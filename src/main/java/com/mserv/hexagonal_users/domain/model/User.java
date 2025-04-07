@@ -1,12 +1,8 @@
 package com.mserv.hexagonal_users.domain.model;
 
-
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-
 
 public class User {
 
@@ -22,17 +18,17 @@ public class User {
     private List<Phone> phones = new ArrayList<>();
 
 
-    public User(Long id, String name, String email, String password, LocalDateTime created, LocalDateTime modified, LocalDateTime lastLogin, String token, boolean active, List<Phone> phones) {
+    public User(Long id, List<Phone> phones, boolean active, LocalDateTime lastLogin, String token, LocalDateTime modified, String password, LocalDateTime created, String email, String name) {
         this.id = id;
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.created = created;
-        this.modified = modified;
+        this.phones = phones;
+        this.active = active;
         this.lastLogin = lastLogin;
         this.token = token;
-        this.active = active;
-        this.phones = phones;
+        this.modified = modified;
+        this.password = password;
+        this.created = created;
+        this.email = email;
+        this.name = name;
     }
 
     public User(){
@@ -81,36 +77,12 @@ public class User {
         this.password = password;
     }
 
-    public List<Phone> getPhones() {
-        return phones;
-    }
-
-    public void setPhones(List<Phone> phones) {
-        this.phones = phones;
-    }
-
     public LocalDateTime getCreated() {
         return created;
     }
 
     public void setCreated(LocalDateTime created) {
         this.created = created;
-    }
-
-    public LocalDateTime getModified() {
-        return modified;
-    }
-
-    public void setModified(LocalDateTime modified) {
-        this.modified = modified;
-    }
-
-    public LocalDateTime getLastLogin() {
-        return lastLogin;
-    }
-
-    public void setLastLogin(LocalDateTime lastLogin) {
-        this.lastLogin = lastLogin;
     }
 
     public String getToken() {
@@ -121,6 +93,22 @@ public class User {
         this.token = token;
     }
 
+    public LocalDateTime getLastLogin() {
+        return lastLogin;
+    }
+
+    public void setLastLogin(LocalDateTime lastLogin) {
+        this.lastLogin = lastLogin;
+    }
+
+    public LocalDateTime getModified() {
+        return modified;
+    }
+
+    public void setModified(LocalDateTime modified) {
+        this.modified = modified;
+    }
+
     public boolean isActive() {
         return active;
     }
@@ -128,4 +116,14 @@ public class User {
     public void setActive(boolean active) {
         this.active = active;
     }
+
+    public List<Phone> getPhones() {
+        return phones;
+    }
+
+    public void setPhones(List<Phone> phones) {
+        this.phones = phones;
+    }
+
+
 }

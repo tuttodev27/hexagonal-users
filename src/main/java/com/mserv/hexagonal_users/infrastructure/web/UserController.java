@@ -54,7 +54,7 @@ public class UserController {
                 userEntity.setActive(true);
 
                 User user = userMapper.toDomain(userEntity);
-                User savedUser = userUseCase.execute(user);
+                User savedUser = userUseCase.createdUser(user);
 
                 UserResponseDTO responseDTO = userMapper.toResponseDTO(savedUser);
                 responseDTO.setToken(token);

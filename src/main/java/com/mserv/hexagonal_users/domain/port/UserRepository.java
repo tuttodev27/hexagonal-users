@@ -1,11 +1,14 @@
 package com.mserv.hexagonal_users.domain.port;
-
 import com.mserv.hexagonal_users.domain.model.User;
+import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
+
+
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 public interface UserRepository{
+
+
     User save(User user);
     Optional<User> findById(Long id);
     Optional<User> findByEmail(String email);
