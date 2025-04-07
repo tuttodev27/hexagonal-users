@@ -39,15 +39,15 @@ El proyecto está estructurado de la siguiente manera:
    ```bash
    git clone https://github.com/tuttodev27/hexagonal-users.git
 
-### 2. Accede al directorio donde se encuentra el proyecto
+## 2. Accede al directorio donde se encuentra el proyecto
 
-
-   ```bash
    cd hexagonal-users
 
-### 3. Instalar Dependencias
-   ```bash
+## 3. Instalar Dependencias
+  
     mvn clean install
-    
 
+## 4. Ejecutar la aplicación
+
+    mvn spring-boot:run
 
