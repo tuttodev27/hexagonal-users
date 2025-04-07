@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PhoneResponseDTO {
-   private Long id;
+
    private String number;
    private String cityCode;
    private String countryCode;
