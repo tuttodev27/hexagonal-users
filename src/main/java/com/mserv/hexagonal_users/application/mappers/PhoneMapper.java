@@ -21,9 +21,6 @@ public class PhoneMapper {
 
         return phoneEntity;
     }
-
-
-    // Convertir de Phone a PhoneRequestDTO
     public static PhoneRequestDTO toRequestDTO(Phone phone) {
         if (phone == null) {
             return null;
@@ -35,8 +32,6 @@ public class PhoneMapper {
                 phone.getCountryCode()
         );
     }
-
-    // Convertir de Phone a PhoneResponseDTO
     public static PhoneResponseDTO toResponseDTO(Phone phone) {
         if (phone == null) {
             return null;
@@ -49,13 +44,10 @@ public class PhoneMapper {
                 phone.getCountryCode()
         );
     }
-
-    // Convertir de PhoneRequestDTO a Phone
     public static Phone toDomain(PhoneRequestDTO phoneRequestDTO) {
         if (phoneRequestDTO == null) {
             return null;
         }
-
         return new Phone(
                 null,
                 phoneRequestDTO.getNumber(),

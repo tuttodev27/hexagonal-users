@@ -23,15 +23,12 @@ public class PhoneEntityMapper {
         if (phone == null) {
             return null;
         }
-
         PhoneEntity phoneEntity = new PhoneEntity();
         phoneEntity.setNumber(phone.getNumber());
         phoneEntity.setCityCode(phone.getCityCode());
         phoneEntity.setCountryCode(phone.getCountryCode());
-        phoneEntity.setUser(userEntity);  // Aquí ya usamos el `userEntity` correcto
+        phoneEntity.setUser(userEntity);
 
         return phoneEntity;
     }
-
-
 }

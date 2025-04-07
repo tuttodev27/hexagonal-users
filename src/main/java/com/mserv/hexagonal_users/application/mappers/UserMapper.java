@@ -9,13 +9,12 @@ import com.mserv.hexagonal_users.infrastructure.adapter.persistence.mapper.Phone
 import com.mserv.hexagonal_users.infrastructure.DTO.UserRequestDTO;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 @Component
 public class UserMapper {
 
-    // Conversion from User to UserEntity
+
     public static UserEntity toEntity(User user) {
         if (user == null) {
             return null;
@@ -32,10 +31,9 @@ public class UserMapper {
         userEntity.setToken(user.getToken());
         userEntity.setActive(user.isActive());
 
-        // Asignar los teléfonos correctamente
         if (user.getPhones() != null) {
             List<PhoneEntity> phoneEntities = user.getPhones().stream()
-                    .map(phone -> PhoneEntityMapper.toEntity(phone, userEntity))  // Aseguramos que el teléfono tenga su usuario asociado
+                    .map(phone -> PhoneEntityMapper.toEntity(phone, userEntity))
                     .collect(Collectors.toList());
             userEntity.setPhones(phoneEntities);
         }
@@ -43,30 +41,24 @@ public class UserMapper {
         return userEntity;
     }
 
-
-    // En UserMapper.toDomain
-    public static UserEntity fromRequestDTO(UserRequestDTO userRequestDTO) {
+   public static UserEntity fromRequestDTO(UserRequestDTO userRequestDTO) {
         if (userRequestDTO == null) {
             return null;
         }
 
-        // Mapear las propiedades de UserRequestDTO a UserEntity
         UserEntity userEntity = new UserEntity();
         userEntity.setName(userRequestDTO.getName());
         userEntity.setEmail(userRequestDTO.getEmail());
         userEntity.setPassword(userRequestDTO.getPassword());
 
         List<Phone> phoneList = userRequestDTO.getPhones().stream()
-                .map(phoneRequestDTO -> PhoneMapper.toDomain(phoneRequestDTO))  // Usando lambda en lugar de method reference
+                .map(phoneRequestDTO -> PhoneMapper.toDomain(phoneRequestDTO))
                 .collect(Collectors.toList());
 
-
-        // Inicializa las fechas antes de persistir
         userEntity.prePersist();
 
         return userEntity;
     }
-    // Conversion from User to UserResponseDTO
     public UserResponseDTO toResponseDTO(User user) {
         if (user == null) {
             return null;
@@ -86,8 +78,6 @@ public class UserMapper {
                 user.isActive()
         );
     }
-
-
         public static User toDomain(UserEntity userEntity) {
             if (userEntity == null) {
                 return null;
@@ -104,10 +94,9 @@ public class UserMapper {
             user.setToken(userEntity.getToken());
             user.setActive(userEntity.isActive());
 
-            // Map phones from UserEntity to User
             if (userEntity.getPhones() != null) {
                 List<Phone> phones = userEntity.getPhones().stream()
-                        .map(PhoneEntityMapper::toDomain)  // Assuming you have a method to convert PhoneEntity to Phone
+                        .map(PhoneEntityMapper::toDomain)
                         .collect(Collectors.toList());
                 user.setPhones(phones);
             }

@@ -5,12 +5,12 @@ import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.AuthService;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
-import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
+
 
 @Service
 public class UserUseCase {
@@ -32,19 +32,17 @@ public class UserUseCase {
             throw new UserAlreadyExistsException("El correo ya está registrado");
         });
 
-
         user.setId(System.currentTimeMillis());
         LocalDateTime now = LocalDateTime.now();
         user.setCreated(now);
         user.setModified(now);
         user.setLastLogin(now);
 
-        // Generar y asignar el token
         String token = authService.generateToken(user.getEmail());
         user.setToken(token);
         user.setActive(true);
 
-        // Persistir el usuario
+
         return userRepository.save(user);
     }
 
@@ -58,7 +56,7 @@ public class UserUseCase {
     }
 
     public User updateUser(User user) {
-        getUserById(user.getId());  // Primero buscamos el usuario por ID
+        getUserById(user.getId());
         user.setModified(LocalDateTime.now());
         return userRepository.save(user);
     }

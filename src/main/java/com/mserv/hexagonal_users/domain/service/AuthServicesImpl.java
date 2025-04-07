@@ -14,10 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
-import java.util.Date;
-import java.util.Optional;
 
-import static javax.crypto.Cipher.SECRET_KEY;
+import java.util.Optional;
 
 @Service
 public class AuthServicesImpl implements AuthService {
@@ -49,22 +47,17 @@ public class AuthServicesImpl implements AuthService {
 
     @Override
     public String generateToken(String email) {
-        // Verificar que la clave secreta no sea nula ni vacía
         if (secretKey == null || secretKey.isEmpty()) {
             throw new IllegalArgumentException("La clave secreta no puede ser nula o vacía");
         }
-
-        // Crear la clave de firma con la clave secreta
         Key key = Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
 
-        // Generar el token JWT con el correo electrónico como subject
+
         return Jwts.builder()
-                .setSubject(email) // Usamos el correo electrónico como el subject
+                .setSubject(email)
                 .signWith(key, SignatureAlgorithm.HS256)
                 .compact();
     }
-
-
 
     @Override
     public boolean validateToken(String token) {
@@ -75,7 +68,6 @@ public class AuthServicesImpl implements AuthService {
             return false;
         }
     }
-
     @Override
     public Optional<String> getUserFromToken(String token) {
         try {
@@ -87,6 +79,5 @@ public class AuthServicesImpl implements AuthService {
             return Optional.empty();
         }
     }
-
 }
 

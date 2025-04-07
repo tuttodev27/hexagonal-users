@@ -14,14 +14,14 @@ import com.mserv.hexagonal_users.infrastructure.exception.ErrorResponse;
 import com.mserv.hexagonal_users.infrastructure.util.JWTUtil;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,7 +44,7 @@ public class UserController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
 
             try {
-                // Convert from UserRequestDTO to UserEntity
+
                 UserEntity userEntity = userMapper.fromRequestDTO(userRequestDTO);
                 userEntity.setCreated(LocalDateTime.now());
                 userEntity.setModified(LocalDateTime.now());
@@ -53,13 +53,9 @@ public class UserController {
                 userEntity.setToken(token);
                 userEntity.setActive(true);
 
-                // Map UserEntity to User domain model
-                User user = userMapper.toDomain(userEntity); // Assuming you have a toDomain method to convert UserEntity to User
-
-                // Save the user via UseCase
+                User user = userMapper.toDomain(userEntity);
                 User savedUser = userUseCase.execute(user);
 
-                // Convert savedUser to UserResponseDTO and send response
                 UserResponseDTO responseDTO = userMapper.toResponseDTO(savedUser);
                 responseDTO.setToken(token);
 
@@ -117,17 +113,13 @@ public class UserController {
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable Long id, @Valid @RequestBody UserRequestDTO userRequestDTO) {
         try {
-            // Convert DTO to UserEntity first
+
             UserEntity userEntity = userMapper.fromRequestDTO(userRequestDTO);
             userEntity.setId(id);
 
-            // Convert UserEntity to User (domain model)
             User user = userMapper.toDomain(userEntity);
-
-            // Update the user using the UseCase
             User updatedUser = userUseCase.updateUser(user);
 
-            // Convert updatedUser to UserResponseDTO and send response
             UserResponseDTO responseDTO = userMapper.toResponseDTO(updatedUser);
             return ResponseEntity.ok(responseDTO);
         } catch (UserNotFoundException e) {

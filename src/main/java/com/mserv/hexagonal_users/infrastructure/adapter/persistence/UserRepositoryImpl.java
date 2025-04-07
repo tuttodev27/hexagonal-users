@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
+
 import java.util.stream.Collectors;
 
 @Repository
@@ -24,7 +24,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private UserEntity toEntity(User user) {
-        // Creamos y devolvemos la entidad UserEntity
+
         UserEntity userEntity= UserEntity.builder()
                 .id(user.getId())
                 .name(user.getName())
@@ -49,9 +49,6 @@ public class UserRepositoryImpl implements UserRepository {
 
     }
 
-
-
-
     private User toDomain(UserEntity userEntity) {
         return new User(
             userEntity.getId(),
@@ -68,8 +65,6 @@ public class UserRepositoryImpl implements UserRepository {
                     .collect(Collectors.toList()) : new ArrayList<>()
     );
 }
-
-
 
     @Override
     public User save(User user) {
