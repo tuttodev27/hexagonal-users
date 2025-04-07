@@ -28,14 +28,14 @@ public class UserUseCase {
         return userRepository.existsByEmail(email);
     }
 
-    // Método para crear un nuevo usuario
+
     public User createdUser(User user) {
-        // Verifica si el correo ya está registrado
+
         userRepository.findByEmail(user.getEmail()).ifPresent(existingUser -> {
             throw new UserAlreadyExistsException("El correo ya está registrado");
         });
 
-        // Establece valores de fecha y token
+
         LocalDateTime now = LocalDateTime.now();
         user.setCreated(now);
         user.setModified(now);
@@ -44,11 +44,7 @@ public class UserUseCase {
         String token = authService.generateToken(user.getEmail());
         user.setToken(token);
         user.setActive(true);
-
-        // Asegúrate de que el ID sea no nulo, si no se establece uno por defecto
-        if (user.getId() == null) {
-            user.setId(System.currentTimeMillis());  // Asigna un ID único
-        }
+        user.setId(null);
 
         // Guarda el usuario
         return userRepository.save(user);

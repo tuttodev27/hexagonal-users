@@ -38,7 +38,7 @@ public class UserEntity {
    @Version
    private Long version;
 
-   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+   @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
    private List<PhoneEntity> phones = new ArrayList<>();
 
    public void prePersist() {

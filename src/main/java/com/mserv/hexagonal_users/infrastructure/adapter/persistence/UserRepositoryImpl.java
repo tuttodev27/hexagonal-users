@@ -5,10 +5,12 @@ import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
 import com.mserv.hexagonal_users.infrastructure.adapter.persistence.mapper.PhoneEntityMapper;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +26,7 @@ public class UserRepositoryImpl implements UserRepository {
     }
 
     private UserEntity toEntity(User user) {
-
-        UserEntity userEntity= UserEntity.builder()
+        UserEntity userEntity = UserEntity.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
@@ -37,17 +38,27 @@ public class UserRepositoryImpl implements UserRepository {
                 .active(user.isActive())
                 .build();
 
-        List<PhoneEntity> phoneEntities = user.getPhones() != null
-                ? user.getPhones().stream()
-                .map(phone -> PhoneEntityMapper.toEntity(phone, userEntity))
-                .collect(Collectors.toList())
-                : new ArrayList<>();
+        // Verificar si la lista de teléfonos es null, y si es así, asignar una lista vacía
+        if (user.getPhones() != null && !user.getPhones().isEmpty()) {
+            List<PhoneEntity> phoneEntities = user.getPhones().stream()
+                    .map(phone -> PhoneEntity.builder()
+                            .number(phone.getNumber())
+                            .cityCode(phone.getCityCode())
+                            .countryCode(phone.getCountryCode())
+                            .user(userEntity)
+                            .build())
+                    .collect(Collectors.toList());
+            userEntity.setPhones(phoneEntities);
+        } else {
+            userEntity.setPhones(Collections.emptyList()); // Asignar lista vacía si es null
+        }
 
-        userEntity.setPhones(phoneEntities);
+        System.out.println("Teléfonos durante la conversión a entidad: " + userEntity.getPhones()); // Verificación
 
         return userEntity;
-
     }
+
+
 
     private User toDomain(UserEntity userEntity) {
         return new User(
@@ -65,7 +76,7 @@ public class UserRepositoryImpl implements UserRepository {
                 userEntity.getName()  // String
         );
     }
-
+    @Transactional
     @Override
     public User save(User user) {
 
@@ -73,11 +84,9 @@ public class UserRepositoryImpl implements UserRepository {
             throw new UserAlreadyExistsException("Ya existe un usuario con este correo");
         }
 
-        if (user.getId() == null) {
-            user.setId(System.currentTimeMillis());
-        }
         UserEntity userEntity = toEntity(user);
         UserEntity savedEntity = jpaUserRepository.save(userEntity);
+        System.out.println("Teléfonos antes de guardar: " + userEntity.getPhones());
         return toDomain(savedEntity);
     }
 

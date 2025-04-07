@@ -24,6 +24,7 @@ public class PhoneEntity {
     private String countryCode;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JoinColumn(name = "user_id")
     private UserEntity user;
+
 }

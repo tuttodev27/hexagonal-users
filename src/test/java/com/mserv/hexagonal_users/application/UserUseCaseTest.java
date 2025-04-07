@@ -2,12 +2,12 @@ package com.mserv.hexagonal_users.application;
 
 import com.mserv.hexagonal_users.application.exception.UserAlreadyExistsException;
 import com.mserv.hexagonal_users.application.exception.UserNotFoundException;
-import com.mserv.hexagonal_users.application.mappers.UserMapper;
+
 import com.mserv.hexagonal_users.application.usecase.UserUseCase;
 import com.mserv.hexagonal_users.domain.model.User;
 import com.mserv.hexagonal_users.domain.port.AuthService;
 import com.mserv.hexagonal_users.domain.port.UserRepository;
-import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

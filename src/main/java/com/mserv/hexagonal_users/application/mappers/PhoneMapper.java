@@ -48,11 +48,11 @@ public class PhoneMapper {
         if (phoneRequestDTO == null) {
             return null;
         }
-        return new Phone(
-                null,
-                phoneRequestDTO.getNumber(),
-                phoneRequestDTO.getCityCode(),
-                phoneRequestDTO.getCountryCode()
-        );
+        Phone phone= new Phone();
+        phone.setNumber(phoneRequestDTO.getNumber());
+        phone.setCityCode(phoneRequestDTO.getCountryCode());
+        phone.setCountryCode(phone.getCountryCode());
+
+        return phone;
     }
 }

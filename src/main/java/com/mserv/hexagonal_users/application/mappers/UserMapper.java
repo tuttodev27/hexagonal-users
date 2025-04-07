@@ -41,7 +41,7 @@ public class UserMapper {
         return userEntity;
     }
 
-   public static UserEntity fromRequestDTO(UserRequestDTO userRequestDTO) {
+    public static UserEntity fromRequestDTO(UserRequestDTO userRequestDTO) {
         if (userRequestDTO == null) {
             return null;
         }
@@ -51,14 +51,19 @@ public class UserMapper {
         userEntity.setEmail(userRequestDTO.getEmail());
         userEntity.setPassword(userRequestDTO.getPassword());
 
-        List<Phone> phoneList = userRequestDTO.getPhones().stream()
-                .map(phoneRequestDTO -> PhoneMapper.toDomain(phoneRequestDTO))
+        // Convierte la lista de Phone a PhoneEntity
+        List<PhoneEntity> phoneEntities = userRequestDTO.getPhones().stream()
+                .map(phoneRequestDTO -> PhoneEntityMapper.toEntity(PhoneMapper.toDomain(phoneRequestDTO), userEntity))
                 .collect(Collectors.toList());
 
+        userEntity.setPhones(phoneEntities);  // Asigna la lista de PhoneEntity
         userEntity.prePersist();
 
         return userEntity;
     }
+
+
+
     public UserResponseDTO toResponseDTO(User user) {
         if (user == null) {
             return null;
