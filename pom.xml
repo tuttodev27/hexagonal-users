@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>3.4.4</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
 	<groupId>com.mserv</groupId>
@@ -32,13 +32,6 @@
 			<artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 
-		<!-- MapStruct para mapeo de objetos -->
-		<dependency>
-			<groupId>org.mapstruct</groupId>
-			<artifactId>mapstruct</artifactId>
-			<version>1.5.2.Final</version>
-		</dependency>
-
 		<!-- Procesador de anotaciones de MapStruct -->
 		<dependency>
 			<groupId>org.mapstruct</groupId>
@@ -47,7 +40,7 @@
 			<scope>provided</scope>
 		</dependency>
 
-
+		<!-- Lombok -->
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
@@ -55,13 +48,14 @@
 			<scope>provided</scope>
 		</dependency>
 
-
+		<!-- Validación de JPA -->
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
 			<version>3.1.0</version>
 		</dependency>
 
+		<!-- JWT -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt-api</artifactId>
@@ -86,31 +80,39 @@
 			<scope>runtime</scope>
 		</dependency>
 
-
+		<!-- Spring Boot Starter Security -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 			<version>3.4.4</version>
 		</dependency>
 
-
+		<!-- Base de datos H2 para pruebas -->
 		<dependency>
 			<groupId>com.h2database</groupId>
 			<artifactId>h2</artifactId>
 			<version>2.1.214</version>
 			<scope>runtime</scope>
 		</dependency>
+
+		<!-- Dependencias de JUnit 5 -->
 		<dependency>
-		<groupId>org.junit.jupiter</groupId>
-		<artifactId>junit-jupiter-api</artifactId>
-		<version>5.10.0</version>
-		<scope>test</scope>
-	</dependency>
-	<dependency>
-		<groupId>org.junit.jupiter</groupId>
-		<artifactId>junit-jupiter-engine</artifactId>
-		<version>5.10.0</version>
-		<scope>test</scope>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-api</artifactId>
+			<version>5.12.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.jupiter</groupId>
+			<artifactId>junit-jupiter-engine</artifactId>
+			<version>5.12.1</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.junit.platform</groupId>
+			<artifactId>junit-platform-launcher</artifactId>
+			<version>1.12.1</version>
+			<scope>test</scope>
 		</dependency>
 
 		<!-- Mockito para mockeo -->
@@ -121,21 +123,17 @@
 			<scope>test</scope>
 		</dependency>
 
-
-
-
-
+		<!-- Spring Boot Starter Test para pruebas -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-
 	</dependencies>
 
 	<build>
 		<plugins>
-
+			<!-- Plugin de Maven para compilar -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
@@ -146,30 +144,43 @@
 					<compilerArgs>--enable-preview</compilerArgs>
 					<annotationProcessorPaths>
 						<path>
-							<groupId>org.mapstruct</groupId>
-							<artifactId>mapstruct-processor</artifactId>
-							<version>1.5.2.Final</version>
-						</path>
-						<path>
 							<groupId>org.projectlombok</groupId>
 							<artifactId>lombok</artifactId>
 							<version>1.18.30</version>
 						</path>
+						<path>
+							<groupId>org.mapstruct</groupId>
+							<artifactId>mapstruct-processor</artifactId>
+							<version>1.5.2.Final</version>
+						</path>
 					</annotationProcessorPaths>
 				</configuration>
 			</plugin>
+
+			<!-- Plugin para ejecutar pruebas -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-surefire-plugin</artifactId>
-				<version>3.0.0-M5</version>
+				<version>3.5.2</version>
 				<configuration>
-					<useModulePath>false</useModulePath>
+					<forkCount>1</forkCount> <!-- Ensures tests are run in a separate JVM -->
+					<reuseForks>true</reuseForks> <!-- Reuse forked JVMs for subsequent tests to improve performance -->
+					<useSystemClassLoader>false</useSystemClassLoader> <!-- Avoid using the system classloader when forking -->
 					<includes>
-						<include>**/Test*.java</include>
+						<include>**/*Test*.java</include>
 					</includes>
+					<properties>
+						<property>
+							<name>junit.platform.version</name>
+							<value>5.12.1</value>
+						</property>
+						<property>
+							<name>surefire.rerunFailingTestsCount</name>
+							<value>3</value> <!-- Retry failed tests -->
+						</property>
+					</properties>
 				</configuration>
 			</plugin>
-
 
 		</plugins>
 	</build>

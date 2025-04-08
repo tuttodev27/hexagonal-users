@@ -9,8 +9,6 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-
-
 public class UserResponseDTO {
 
     private Long id;
@@ -26,4 +24,5 @@ public class UserResponseDTO {
     private String token;
     private boolean active;
 
+    
 }
