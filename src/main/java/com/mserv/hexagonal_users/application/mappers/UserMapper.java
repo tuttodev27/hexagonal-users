@@ -62,8 +62,6 @@ public class UserMapper {
         return userEntity;
     }
 
-
-
     public UserResponseDTO toResponseDTO(User user) {
         if (user == null) {
             return null;
@@ -74,7 +72,7 @@ public class UserMapper {
                 user.getName(),
                 user.getEmail(),
                 user.getPhones().stream()
-                        .map(PhoneMapper::toResponseDTO)  // Convertir teléfonos a response DTO
+                        .map(phone -> PhoneMapper.toResponseDTO(phone))  // Cambiar esta línea para usar PhoneResponseDTO
                         .collect(Collectors.toList()),
                 user.getCreated(),
                 user.getModified(),
@@ -83,6 +81,8 @@ public class UserMapper {
                 user.isActive()
         );
     }
+
+
         public static User toDomain(UserEntity userEntity) {
             if (userEntity == null) {
                 return null;
