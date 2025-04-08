@@ -18,7 +18,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
 import java.util.List;
+
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -39,18 +42,33 @@ public class UserController {
 
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRequestDTO userRequestDTO) {
-        try {
-            UserResponseDTO responseDTO = userUseCase.registerUser(userRequestDTO);
-            return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
-        } catch (UserAlreadyExistsException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse("400", e.getMessage(), "Correo duplicado", "ERR_DUPLICATE_EMAIL"));
-        } catch (Exception e) {
-            log.error("Error al registrar usuario: ", e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new ErrorResponse("500", "Ocurrió un error al registrar el usuario. Intente nuevamente más tarde.", e.getMessage(), "ERR_INTERNAL_SERVER"));
+
+            try {
+
+                UserEntity userEntity = userMapper.fromRequestDTO(userRequestDTO);
+                userEntity.setCreated(LocalDateTime.now());
+                userEntity.setModified(LocalDateTime.now());
+                userEntity.setLastLogin(LocalDateTime.now());
+                String token = jwtUtil.generateToken(userEntity.getEmail());
+                userEntity.setToken(token);
+                userEntity.setActive(true);
+
+                User user = userMapper.toDomain(userEntity);
+                User savedUser = userUseCase.createdUser(user);
+
+                UserResponseDTO responseDTO = userMapper.toResponseDTO(savedUser);
+                responseDTO.setToken(token);
+
+                return new ResponseEntity<>(responseDTO, HttpStatus.CREATED);
+            } catch (UserAlreadyExistsException e) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                        .body(new ErrorResponse("400", e.getMessage(), "Correo duplicado", "ERR_DUPLICATE_EMAIL"));
+            } catch (Exception e) {
+                log.error("Error al registrar usuario: ", e);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new ErrorResponse("500", "Ocurrió un error al registrar el usuario. Intente nuevamente más tarde.", e.getMessage(), "ERR_INTERNAL_SERVER"));
+            }
         }
-    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequestDTO loginRequest) {

@@ -5,11 +5,22 @@ import com.mserv.hexagonal_users.infrastructure.DTO.PhoneRequestDTO;
 import com.mserv.hexagonal_users.infrastructure.DTO.PhoneResponseDTO;
 import com.mserv.hexagonal_users.infrastructure.adapter.persistence.PhoneEntity;
 import com.mserv.hexagonal_users.infrastructure.adapter.persistence.UserEntity;
-import org.springframework.stereotype.Component;
 
-@Component
 public class PhoneMapper {
+    public static PhoneEntity toEntity(Phone phone, UserEntity userEntity) {
+        if (phone == null) {
+            return null;
+        }
 
+        PhoneEntity phoneEntity = PhoneEntity.builder()
+                .number(phone.getNumber())
+                .cityCode(phone.getCityCode())
+                .countryCode(phone.getCountryCode())
+                .user(userEntity)
+                .build();
+
+        return phoneEntity;
+    }
     public static PhoneRequestDTO toRequestDTO(Phone phone) {
         if (phone == null) {
             return null;
@@ -26,11 +37,12 @@ public class PhoneMapper {
             return null;
         }
 
-        return PhoneResponseDTO.builder()
-                .number(phone.getNumber())
-                .cityCode(phone.getCityCode())
-                .countryCode(phone.getCountryCode())
-                .build();
+        return new PhoneResponseDTO(
+                phone.getId(),
+                phone.getNumber(),
+                phone.getCityCode(),
+                phone.getCountryCode()
+        );
     }
     public static Phone toDomain(PhoneRequestDTO phoneRequestDTO) {
         if (phoneRequestDTO == null) {
@@ -38,28 +50,9 @@ public class PhoneMapper {
         }
         Phone phone= new Phone();
         phone.setNumber(phoneRequestDTO.getNumber());
-        phone.setCityCode(phoneRequestDTO.getCityCode());
-        phone.setCountryCode(phoneRequestDTO.getCountryCode());
+        phone.setCityCode(phoneRequestDTO.getCountryCode());
+        phone.setCountryCode(phone.getCountryCode());
 
         return phone;
     }
-    public static PhoneEntity toEntity(Phone phone, UserEntity userEntity) {
-        if (phone == null) {
-            return null;
-        }
-
-        PhoneEntity phoneEntity = new PhoneEntity();
-
-        phoneEntity.setNumber(phone.getNumber());
-        phoneEntity.setCityCode(phone.getCityCode());
-
-        // Verificar si countryCode es null y asignar valor predeterminado si es necesario
-        phoneEntity.setCountryCode(phone.getCountryCode() != null ? phone.getCountryCode() : "defaultCountryCode");  // Cambia "defaultCountryCode" por el valor que necesites
-
-        phoneEntity.setUser(userEntity);  // Asociar el usuario
-
-        return phoneEntity;
-    }
-
-
 }

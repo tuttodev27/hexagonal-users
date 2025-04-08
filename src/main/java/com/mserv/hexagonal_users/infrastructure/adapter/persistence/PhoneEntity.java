@@ -15,11 +15,10 @@ import java.util.UUID;
 @Builder
 
 public class PhoneEntity {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id")
     private Long id;
-
     private String number;
     private String cityCode;
     private String countryCode;
