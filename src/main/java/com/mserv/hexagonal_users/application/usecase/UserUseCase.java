@@ -40,7 +40,7 @@ public class UserUseCase {
 
     public UserResponseDTO registerUser(UserRequestDTO userRequestDTO) {
 
-        // Validación: podrías mover esto a una clase validator en el futuro
+
         if (userRepository.existsByEmail(userRequestDTO.getEmail())) {
             throw new UserAlreadyExistsException("El correo ya está registrado: " + userRequestDTO.getEmail());
         }
@@ -79,19 +79,16 @@ public class UserUseCase {
 
     // Método para actualizar un usuario
     public User updateUser(User user) {
-        // Verifica si el usuario existe en la base de datos
+
         User existingUser = getUserById(user.getId());
         user.setModified(LocalDateTime.now());
-
-        // Asegúrate de que el campo version esté manejado por Hibernate
-        // Si no se ha modificado, Hibernate gestionará la versión de manera automática
 
         return userRepository.save(user);
     }
 
     // Método para eliminar un usuario
     public void deleteUser(Long id) {
-        // Verifica que el usuario exista antes de eliminarlo
+
         getUserById(id);
         userRepository.deleteById(id);
     }

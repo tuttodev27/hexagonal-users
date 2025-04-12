@@ -21,6 +21,7 @@ public class UserRequestDTO {
 
     @NotBlank(message = "El correo es obligatorio")
     @Email(message = "El formato del correo es inválido")
+    @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "El formato del correo es incorrecto")
     String email;
 
     @NotBlank(message = "La contraseña es obligatoria")

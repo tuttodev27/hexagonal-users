@@ -21,23 +21,21 @@ import static org.mockito.Mockito.when;
 public class UserControllerTest {
 
     @InjectMocks
-    private UserController userController; // Controlador que vamos a probar
+    private UserController userController;
+    @Mock
+    private UserUseCase userUseCase;
 
     @Mock
-    private UserUseCase userUseCase; // Simulación de UserUseCase
+    private JWTUtil jwtUtil;
+    @Mock
+    private UserMapper userMapper;
 
     @Mock
-    private JWTUtil jwtUtil; // Simulación de JWTUtil
-
-    @Mock
-    private UserMapper userMapper; // Simulación de UserMapper
-
-    @Mock
-    private UserResponseDTO userResponseDTO; // DTO de respuesta
+    private UserResponseDTO userResponseDTO;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // Inicializa los mocks
+        MockitoAnnotations.openMocks(this);
     }
 
     @Test
@@ -48,13 +46,11 @@ public class UserControllerTest {
         userRequestDTO.setPassword("password123");
         userRequestDTO.setName("Test User");
 
-        when(userUseCase.registerUser(any(UserRequestDTO.class))).thenReturn(userResponseDTO); // Simulamos que el método registerUser devuelve un DTO
+        when(userUseCase.registerUser(any(UserRequestDTO.class))).thenReturn(userResponseDTO);
 
-        // Act
         ResponseEntity<?> response = userController.registerUser(userRequestDTO);
 
-        // Assert
-        assertEquals(HttpStatus.CREATED, response.getStatusCode()); // Verificamos que el estado sea 201 (CREATED)
-        assertEquals(userResponseDTO, response.getBody()); // Verificamos que el cuerpo de la respuesta sea el DTO esperado
+        assertEquals(HttpStatus.CREATED, response.getStatusCode());
+        assertEquals(userResponseDTO, response.getBody());
     }
 }
